@@ -1,0 +1,110 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: jenkins-k8s
+  labels:
+    name: jenkins-k8s
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: jenkins-k8s
+  name: jenkins-master-service
+  labels:
+    jenkins-k8s-master: deploy
+spec:
+  ports:
+    - port: 80
+      nodePort: 30003
+      targetPort: 8080      
+      name: master 
+    - port: 32055
+      nodePort: 32055    
+      name: slave
+      targetPort: 32055
+  selector:
+    jenkins-k8s-master: deploy
+    tier: jenkins
+  type: NodePort    
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: external-volume-1
+  labels:
+    jenkins-k8s-master: deploy
+spec:
+  capacity:
+    storage: 7Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: manual
+  hostPath:
+    path: "/opt/external-volume-1"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins-k8s-master-pvc
+  namespace: jenkins-k8s
+  labels:
+    jenkins-k8s-master: deploy
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: jenkins-k8s
+  name: jenkins-master-deployment
+  labels:
+    jenkins-k8s: deploy
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      jenkins-k8s-master: deploy
+  template:
+    metadata:
+      labels:
+        jenkins-k8s-master: deploy
+        tier: jenkins
+    spec:
+      containers:
+      - image: fellipef/jenkins-k8s:latest
+        name: jenkins-k8s-master
+        env:
+        - name: JENKINS_HOME
+          value: "/root/.jenkins"
+        - name: JENKINS_SLAVE_AGENT_PORT
+          value: "32055"
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 8080
+          name: jenkins-ui         
+        - containerPort: 50000
+          name: jnlp-port
+        volumeMounts:
+        - name: jenkinsdata
+          mountPath: /root/.jenkins
+        - name: docker
+          mountPath: /var/run/docker.sock
+      volumes:
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock
+      - name: jenkinsdata
+        persistentVolumeClaim:
+         claimName:  jenkins-k8s-master-pvc-claim       
+      nodeSelector:
+        jenkins-k8s-master: deploy
+        
