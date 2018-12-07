@@ -36,5 +36,5 @@ RUN wget  -O /tmp/jdk.tar.gz --no-cookies --no-check-certificate --header "Cooki
 
 # install jdk
 RUN tar -xvf /tmp/jdk.tar.gz -C /usr/local/ && \
-  mv /usr/local/jdk  /usr/local/java
+  mv /usr/local/jdk1.8.0_191  /usr/local/java
 
