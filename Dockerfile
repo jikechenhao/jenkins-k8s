@@ -35,6 +35,6 @@ ENV MAVEN_HOME /opt/maven
 RUN wget  -O /tmp/jdk-8u191-linux-x64.tar.gz --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "https://download.oracle.com/otn-pub/java/jdk/8u191-b12/2787e4a523244c269598db4e85c51e0c/jdk-8u191-linux-x64.tar.gz"
 
 # install jdk
-RUN tar xzf /tmp/jdk-8u191-linux-x64.tar.gz -C /usr/loacal/ && \
+RUN tar xzf /tmp/jdk-8u191-linux-x64.tar.gz -C /usr/local/ && \
   mv /usr/loacal/jdk-8u191 /usr/local/java
 
