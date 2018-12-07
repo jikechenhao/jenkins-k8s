@@ -36,5 +36,5 @@ RUN wget  -O /tmp/jdk-8u191-linux-x64.tar.gz --no-cookies --no-check-certificate
 
 # install jdk
 RUN tar xzf /tmp/jdk-8u191-linux-x64.tar.gz -C /usr/local/ && \
-  mv /usr/loacal/jdk-8u191-linux-x64 /usr/local/java
+  mv /usr/loacal/jdk-8u191-linux-x64  /usr/local/java
 
